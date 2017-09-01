@@ -41,7 +41,7 @@ def cutFile(filename):
         # print "读取到得内容如下：", eachLine
         content += eachLine;
     fopen.close()
-    segList = list(jieba.cut(content))
+    segList = [x.encode('utf-8') for x in list(jieba.cut(content))]
 
     # segList = list(jieba.cut(content))
     # print filename, ":",' '.join(segList)
@@ -99,9 +99,9 @@ if __name__ == '__main__':
     jieba.load_userdict("./dict")
     # 加载停用词
 
-    loadStopWords("./stopwords")
+    # loadStopWords("./stopwords")
 
-    # gen_all_words(filePaths, "allwords");
+    gen_all_words(filePaths, "allwords");
 
     print load_all_words("allwords");
 
