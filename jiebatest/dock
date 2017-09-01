@@ -1,0 +1,46 @@
+分词
+    # jieba.cut 方法接受三个输入参数: 需要分词的字符串；cut_all 参数用来控制是否采用全模式；HMM 参数用来控制是否使用 HMM 模型。
+    # jieba.cut_for_search 方法接受两个参数：需要分词的字符串；是否使用 HMM 模型。该方法适合用于搜索引擎构建倒排索引的分词，粒度比较细。
+    # 待分词的字符串可以是 unicode 或 UTF-8 字符串、GBK 字符串。注意：不建议直接输入 GBK 字符串，可能无法预料地错误解码成 UTF-8。
+    # jieba.cut 以及 jieba.cut_for_search 返回的结构都是一个可迭代的 generator，可以使用 for 循环来获得分词后得到的每一个词语(unicode)，或者用
+    # jieba.lcut 以及 jieba.lcut_for_search 直接返回 list。
+    # jieba.Tokenizer(dictionary=DEFAULT_DICT) 新建自定义分词器，可用于同时使用不同词典。jieba.dt 为默认分词器，所有全局分词相关函数都是该分词器的映射。
+
+词性：
+    import jieba.posseg as pseg
+    pseg.cut(content)
+    见： https://wenku.baidu.com/view/49eab3a9ad51f01dc281f1f8.html
+
+关键词提取
+    import jieba.analyse
+    接口一：
+    jieba.analyse.extract_tags(sentence, topK=20, withWeight=False, allowPOS=())
+        sentence 为待提取的文本
+        topK 为返回几个 TF/IDF 权重最大的关键词，默认值为 20
+        withWeight 为是否一并返回关键词权重值，默认值为 False
+        allowPOS 仅包括指定词性的词，默认值为空，即不筛选
+
+    接口二：
+    jieba.analyse.TFIDF(idf_path=None) 新建 TFIDF 实例，idf_path 为 IDF 频率文件
+
+自定义字典
+    jieba.load_userdict(file_name)#file_name为文件类对象 或自定义词典的路径
+    词典格式：一个词一行:词语，词频（可省略），词性（可省略），用空格隔开，顺序不可颠倒。UTF-8编码。
+    例如： 我国出口量最大的白酒锁啦啦。
+    词典： 锁啦啦
+    不使用词典结果：
+          我国
+          出口量
+          最大
+          的
+          白酒
+          锁
+          啦
+          啦
+    使用词典结果：
+          我国
+          出口量
+          最大
+          的
+          白酒
+          锁啦啦
