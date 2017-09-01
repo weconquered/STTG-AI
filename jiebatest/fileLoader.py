@@ -5,8 +5,11 @@ import jieba.analyse
 import jieba.posseg as pseg
 import pickle
 from pickle import dump
-stop_words = []
+from sentens import *
+import uniout
 
+stop_words = []
+cutlist = "。！？"
 # 加载停用词
 def loadStopWords(filepath):
     fopen = open(filepath, 'r')  # r 代表read
@@ -31,9 +34,22 @@ def eachFile(filepath):
         fileList.append(child.decode('utf-8'))
     return fileList
 
-
-
 # 读取文件内容并打印
+def cutFileBySentens(filename):
+    sentenses = cut_file_sentens(filename)
+    print filename, len(sentenses)
+    result = []
+
+    for sentens in sentenses:
+        result.append((sentens, list(jieba.cut(sentens))))
+
+    # segList = list(jieba.cut(content))
+    # print filename, ":",' '.join(segList)
+    # for seg in segList:
+    # print seg, is_stop_word(seg);
+    return result
+
+    # 读取文件内容并打印
 def cutFile(filename):
     fopen = open(filename, 'r')  # r 代表read
     content = "";
@@ -103,12 +119,14 @@ if __name__ == '__main__':
 
     # gen_all_words(filePaths, "allwords");
 
-    print load_all_words("allwords");
+    #print load_all_words("allwords");
 
     for filePath in filePaths:
         #cutFileWithPosseg(filePath)
-        # cutFile(filePath)
+        #cutFile(filePath)
         # cutWithWeight(filePath)
+        # cut_file_sentens(filePath)
+        print  cutFileBySentens(filePath)
         print "================"
 
     # TODO
