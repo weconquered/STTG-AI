@@ -6,16 +6,19 @@ import jieba.posseg as pseg
 import pickle
 from pickle import dump
 from sentens import *
+from collections import Counter
 import uniout
 
 stop_words = []
 cutlist = "。！？"
 # 加载停用词
-def loadStopWords(filepath):
-    fopen = open(filepath, 'r')  # r 代表read
-    for eachLine in fopen:
-        stop_words.append(eachLine.decode('utf-8'))
-    fopen.close()
+def loadStopWords(filepath = "./stopword"):
+    file_list = eachFile(filepath)
+    for file_name in file_list:
+        fopen = open(file_name, 'r')  # r 代表read
+        for eachLine in fopen:
+            stop_words.append(eachLine.replace("\r\n", "").decode("utf-8"))
+        fopen.close()
 
 # 判断是否是停用词
 def is_stop_word(word):
@@ -35,7 +38,8 @@ def eachFile(filepath):
     return fileList
 
 # 读取文件内容并打印
-def cutFileBySentens(filename):
+def cutFileBySentens(filename, clear_stop_word = False):
+    #TODO
     sentenses = cut_file_sentens(filename)
     print filename, len(sentenses)
     result = []
@@ -50,14 +54,21 @@ def cutFileBySentens(filename):
     return result
 
     # 读取文件内容并打印
-def cutFile(filename):
+def cutFile(filename, clear_stop_word=False):
     fopen = open(filename, 'r')  # r 代表read
-    content = "";
+    content = ""
     for eachLine in fopen:
         # print "读取到得内容如下：", eachLine
-        content += eachLine.replace(" ","");
+        content += eachLine.replace(" ","")
     fopen.close()
     segList = list(jieba.cut(content))
+
+    if clear_stop_word:
+        result = []
+        for seg in segList:
+            if not is_stop_word(seg):
+                result.append(seg)
+        return result
 
     # segList = list(jieba.cut(content))
     # print filename, ":",' '.join(segList)
@@ -65,12 +76,16 @@ def cutFile(filename):
         #print seg, is_stop_word(seg);
     return segList
 
+# 对某字符串分词
+def cut_str(str):
+    return list(jieba.cut(str))
+
 def cutFileWithPosseg(filename):
     fopen = open(filename, 'r')  # r 代表read
-    content = "";
+    content = ""
     for eachLine in fopen:
         # print "读取到得内容如下：", eachLine
-        content += eachLine;
+        content += eachLine
     fopen.close()
     segList = pseg.cut(content)
 
@@ -84,7 +99,7 @@ def cutWithWeight(filename):
     content = ""
     for eachLine in fopen:
         # print "读取到得内容如下：", eachLine
-        content += eachLine;
+        content += eachLine
     fopen.close()
     segList = list(jieba.analyse.extract_tags(content, 50, True))
 
@@ -93,12 +108,16 @@ def cutWithWeight(filename):
     for seg in segList:
         print seg[0],seg[1], is_stop_word(seg[0])
 
-def gen_all_words(filePaths, destination_file):
+def gen_all_words(filePaths, destination_file, clear_stop_word):
     file = open(destination_file, 'w')
     all_words = []
     for filePath in filePaths:
-        all_words.append(cutFile(filePath))
+        all_words.extend(cutFile(filePath, clear_stop_word))
     dump(all_words, file)
+    file.close()
+
+    file = open(destination_file + "_dic", 'w')
+    dump(dict(Counter(all_words)), file)
     file.close()
 
 def load_all_words(destination_file):
@@ -106,6 +125,19 @@ def load_all_words(destination_file):
     words = pickle.load(file)
     file.close()
     return words
+
+# 计算词字典
+# 输出： 词频表、  词表
+# 更新停用词
+# 更新词表
+# 给出常词表
+# 根据词频表给出  关键词表，关键词表 + 常词表  有可能就是答案集合
+#
+def step_1():
+    gen_all_words(filePaths, "allwords", True);
+    print load_all_words("allwords");
+    print load_all_words("allwords_dic")
+
 
 if __name__ == '__main__':
     filePathC = "./news"
@@ -115,11 +147,8 @@ if __name__ == '__main__':
     jieba.load_userdict("./dict")
     # 加载停用词
 
-    loadStopWords("./stopwords")
-
-    # gen_all_words(filePaths, "allwords");
-
-    print load_all_words("allwords");
+    loadStopWords()
+    # gen_all_words(filePaths, "allwords", True);
 
     for filePath in filePaths:
         #cutFileWithPosseg(filePath)
@@ -130,6 +159,6 @@ if __name__ == '__main__':
         print "================"
 
     # TODO
-    # 自动找字典
+    # 自动找字典 RUN
     # 找答案集合
-    # 按句子分词
+    # 按句子分词 OK
