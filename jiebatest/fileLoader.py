@@ -3,7 +3,8 @@ import os
 import jieba
 import jieba.analyse
 import jieba.posseg as pseg
-
+import pickle
+from pickle import dump
 stop_words = []
 
 # 加载停用词
@@ -12,7 +13,6 @@ def loadStopWords(filepath):
     for eachLine in fopen:
         stop_words.append(eachLine.decode('utf-8'))
     fopen.close()
-    print stop_words
 
 # 判断是否是停用词
 def is_stop_word(word):
@@ -45,8 +45,9 @@ def cutFile(filename):
 
     # segList = list(jieba.cut(content))
     # print filename, ":",' '.join(segList)
-    for seg in segList:
-        print seg, is_stop_word(seg);
+    #for seg in segList:
+        #print seg, is_stop_word(seg);
+    return segList
 
 def cutFileWithPosseg(filename):
     fopen = open(filename, 'r')  # r 代表read
@@ -59,11 +60,12 @@ def cutFileWithPosseg(filename):
 
     for seg in segList:
         print seg.word, seg.flag, is_stop_word(seg.word);
+    return segList
 
 # 读取文件内容并打印
 def cutWithWeight(filename):
     fopen = open(filename, 'r')  # r 代表read
-    content = "";
+    content = ""
     for eachLine in fopen:
         # print "读取到得内容如下：", eachLine
         content += eachLine;
@@ -73,8 +75,21 @@ def cutWithWeight(filename):
     # segList = list(jieba.cut(content))
     # print filename, ":",' '.join(segList)
     for seg in segList:
-        print seg[0],seg[1], is_stop_word(seg[0]);
+        print seg[0],seg[1], is_stop_word(seg[0])
 
+def gen_all_words(filePaths, destination_file):
+    file = open(destination_file, 'w')
+    all_words = []
+    for filePath in filePaths:
+        all_words.append(cutFile(filePath))
+    dump(all_words, file)
+    file.close()
+
+def load_all_words(destination_file):
+    file = open(destination_file, 'rb')
+    words = pickle.load(file)
+    file.close()
+    return words
 
 if __name__ == '__main__':
     filePathC = "./news"
@@ -83,10 +98,15 @@ if __name__ == '__main__':
     # 加载词典
     jieba.load_userdict("./dict")
     # 加载停用词
+
     loadStopWords("./stopwords")
 
+    # gen_all_words(filePaths, "allwords");
+
+    print load_all_words("allwords");
+
     for filePath in filePaths:
-        cutFileWithPosseg(filePath)
+        #cutFileWithPosseg(filePath)
         # cutFile(filePath)
         # cutWithWeight(filePath)
         print "================"
