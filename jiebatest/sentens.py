@@ -32,7 +32,7 @@ def cut_file_sentens(file_name):
     fopen = open(file_name, 'r')  # r 代表read
     for eachLine in fopen:
         # print "读取到得内容如下：", eachLine
-        content += eachLine
+        content += eachLine.replace(" ","")
     fopen.close()
 
     l = cut_sentens(content.decode('utf-8'))

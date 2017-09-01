@@ -55,7 +55,7 @@ def cutFile(filename):
     content = "";
     for eachLine in fopen:
         # print "读取到得内容如下：", eachLine
-        content += eachLine;
+        content += eachLine.replace(" ","");
     fopen.close()
     segList = list(jieba.cut(content))
 
@@ -119,14 +119,14 @@ if __name__ == '__main__':
 
     # gen_all_words(filePaths, "allwords");
 
-    #print load_all_words("allwords");
+    print load_all_words("allwords");
 
     for filePath in filePaths:
         #cutFileWithPosseg(filePath)
         #cutFile(filePath)
         # cutWithWeight(filePath)
         # cut_file_sentens(filePath)
-        print  cutFileBySentens(filePath)
+        # print  cutFileBySentens(filePath)
         print "================"
 
     # TODO
