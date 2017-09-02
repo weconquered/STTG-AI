@@ -20,7 +20,9 @@ tag_3 = pre_fix + "3_产品原材料需求文档"
 tag_4 = pre_fix + "4_产品外观外形设计文档"
 tag_5 = pre_fix + "5_产品相关专利文档"
 tag_6 = pre_fix + "6_产品工艺设计"
+tag_test = pre_fix + "2_产品制作工艺流程副本"
 stop_words = []
+all_words = []
 cutlist = "。！？"
 # 加载停用词
 def loadStopWords(filepath = "./stopword"):
@@ -45,7 +47,8 @@ def eachFile(filepath):
     for allDir in pathDir:
         child = os.path.join('%s/%s' % (filepath, allDir))
         print child.decode('utf-8')  # .decode('utf-8')是解决中文显示乱码问题
-        fileList.append(child.decode('utf-8'))
+        if child[-1] == 't':
+            fileList.append(child.decode('utf-8'))
     return fileList
 
 # 读取文件内容并打印
@@ -120,19 +123,23 @@ def cutWithWeight(filename):
     for seg in segList:
         print seg[0],seg[1], is_stop_word(seg[0])
 
-all_words = []
+
 
 def gen_all_words_worker(worker_id, filePaths, clear_stop_word):
     count_w = 0
     le = len(filePaths)
+    ww = []
     for filePath in filePaths:
-        all_words.extend(cutFile(filePath, clear_stop_word))
+        res = cutFile(filePath, clear_stop_word)
+        ww.extend(res)
+        # all_words.extend([1,2])
         count_w += 1
         print worker_id, str(count_w) + "/" + str(le) ,filePath
+    file = open("tmp_" + str(worker_id), 'w')
+    dump(ww, file)
+    file.close()
 
 def gen_all_words(pre, filePaths, destination_file, clear_stop_word):
-    file = open(pre + destination_file, 'w')
-
     print "共：" + str(len(filePaths)) + " 个文件"
     worker_size = 3
     total_len = len(filePaths)
@@ -156,7 +163,17 @@ def gen_all_words(pre, filePaths, destination_file, clear_stop_word):
         t.start()
     for t in threads:
         t.join()
+    print all_words
 
+    #合并
+    for i in range(0, worker_size):
+        file = open("tmp_" + str(i), 'rb')
+        words = pickle.load(file)
+        all_words.extend(words)
+        file.close()
+        os.remove("tmp_" + str(i))
+
+    file = open(pre + destination_file, 'w')
     dump(all_words, file)
     file.close()
 
@@ -185,7 +202,7 @@ def step_1(pre, filePaths):
 
 
 if __name__ == '__main__':
-    filePathC = tag_2
+    filePathC = tag_test
     filePaths = eachFile(filePathC)
 
     #tag = sys.argv[1]
@@ -197,9 +214,10 @@ if __name__ == '__main__':
     # 加载停用词
 
     loadStopWords()
-    step_1("2_", filePaths)
-    # gen_all_words(filePaths, "allwords", True);
+    step_1("test_", filePaths)
 
+    # gen_all_words(filePaths, "allwords", True);
+    # print load_all_words("test_allwords_dic")
     for filePath in filePaths:
         #cutFileWithPosseg(filePath)
         #cutFile(filePath)
