@@ -8,8 +8,10 @@ from pickle import dump
 from sentens import *
 from collections import Counter
 import math
-import threading
+# from threading import Thread as worker
+from processing import Process as worker
 import uniout
+import sys
 
 pre_fix = "/Users/boloomo/Downloads/corpus/"
 tag_1 = pre_fix + "1_产品使用说明文档"
@@ -128,11 +130,11 @@ def gen_all_words_worker(worker_id, filePaths, clear_stop_word):
         count_w += 1
         print worker_id, str(count_w) + "/" + str(le) ,filePath
 
-def gen_all_words(filePaths, destination_file, clear_stop_word):
-    file = open(destination_file, 'w')
+def gen_all_words(pre, filePaths, destination_file, clear_stop_word):
+    file = open(pre + destination_file, 'w')
 
     print "共：" + str(len(filePaths)) + " 个文件"
-    worker_size = 5
+    worker_size = 3
     total_len = len(filePaths)
     sentens_per_worker = math.ceil(total_len / worker_size)
 
@@ -142,8 +144,11 @@ def gen_all_words(filePaths, destination_file, clear_stop_word):
     # top_x
     for i in range(0, worker_size):
         worker_index.append((i * sentens_per_worker, min((i + 1) * sentens_per_worker, total_len) - 1))
-        t = threading.Thread(target=gen_all_words_worker,
-                             args=(i, filePaths[int(i * sentens_per_worker): int(min((i + 1) * sentens_per_worker, total_len))],clear_stop_word))
+        # t = worker(target=gen_all_words_worker,
+        #                      args=(i, filePaths[int(i * sentens_per_worker): int(min((i + 1) * sentens_per_worker, total_len))],clear_stop_word))
+        t = worker(target=gen_all_words_worker, args=(i, filePaths[int(i * sentens_per_worker): int(min((i + 1) * sentens_per_worker, total_len))],
+                         clear_stop_word))
+
         threads.append(t)
 
     for t in threads:
@@ -155,7 +160,7 @@ def gen_all_words(filePaths, destination_file, clear_stop_word):
     dump(all_words, file)
     file.close()
 
-    file = open(destination_file + "_dic", 'w')
+    file = open(pre + destination_file + "_dic", 'w')
     dump(dict(Counter(all_words)), file)
     file.close()
 
@@ -173,22 +178,26 @@ def load_all_words(destination_file):
 # 给出常词表
 # 根据词频表给出  关键词表，关键词表 + 常词表  有可能就是答案集合
 #
-def step_1():
-    gen_all_words(filePaths, "allwords", True);
+def step_1(pre, filePaths):
+    gen_all_words(pre, filePaths, "allwords", True);
     # print load_all_words("allwords");
     # print load_all_words("allwords_dic")
 
 
 if __name__ == '__main__':
-    filePathC = tag_1
+    filePathC = tag_2
     filePaths = eachFile(filePathC)
 
+    #tag = sys.argv[1]
+    #begin = sys.argv[2]
+    #end = sys.argv[3]
+    #pre = sys.arg[4]
     # 加载词典
     jieba.load_userdict("./dict")
     # 加载停用词
 
     loadStopWords()
-    step_1()
+    step_1("2_", filePaths)
     # gen_all_words(filePaths, "allwords", True);
 
     for filePath in filePaths:
