@@ -1,0 +1,3 @@
+@echo off
+dir /s/b *.* > 文件名.txt
+exit

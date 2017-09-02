@@ -1,0 +1,85 @@
+                   Goodrive10                                   
+ 
+ 
+ 
+ 
+ 
+ IP00S/N: MADE IN CHINASHENZHEN INVT ELECTRIC CO., LTD.MODEL: GD10-2R2G-4POWER(OUTPUT): 2.2kW INPUT:AC3PH380V(-15%)-440V(+10%)7.1A47Hz-63Hz OUTPUT: AC 3PH 0V-Vin 5.5A 0Hz-400Hz
+ 
+ 
+ 
+    BA A   B     
+ 
+ S5/Y AO AI 485IVVO I I ONJ1 J2 J3 J4
+            
+ 132 45
+ 
+                         
+                          :      ,        ,     +    。                                    :      ,        ,     +    。                         :      ,        ,     +    。    
+ 
+ 
+ 
+ 
+      f fmaxf1t1f1  P01.01   t1  P01.02    t    f fmax  t t1 t2
+     ON                          OFF                       t              t                 f          
+     ft1<t2,         t1+t2=t3,        t3=P01.20t1 t2t3   t              ft1=P01.22   t          t1
+         fP01.24  t    
+   t 1  1  116% 200%    V  A    f
+     V V3V2 V1    ff1 f2 f3
+ 
+ FWD K2 REV COMK1 K2     OFFOFF   ON OFF     OFF ON      ON ON   K1 K2     OFFOFF    ON OFF     OFF ON   K1FWD K2 REV COMK1SB1SB2FWD SlnK REV COMK      ON      OFF    ONON     
+ Si  Si                    SB1SB2FWD SlnSB3 REV COM
+     100%AI1/AI2AI10V 20mA-100%
+ RO  RO                     
+     
+ 
+ 
+ 
+ 
+ Si Y、R O
+     fR O、YFDT     t  tFDT      f         Y、R O  t  t
+ 
+ 
+ 
+              t  t    f P09.11t1<T2,          t2=P09.12PIDE  tt1 t2        PIDE
+ P10.02P10.32P10.04     (2 )     (2 )P10.28P10.30P10.03 P10.05 P10.07P10.31 P10.33P10.06
+ 
+     A        f       t  t    A          f  t  t          
+     A      Y、R O  t        t   t   t
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+            RS232-485 GND RS    15m   485+ 485+ 485- 485-   485+ 120Ω              11# 32#15#         2         n......485-6#     
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     (%) 10080 60 40 20  T(°C)   :      50°C       ,  ,            。    (%) 10080 60 40 200-10 0 10 20 30 40 50    (m) 1000 2000 3000 4000
+ 
+ 
+ 
+         485-     PB +                                     485+ RS485  RS232     
+ 
+ 
+            
+ 
+ 
+ 
+ 
+ 
+ 
+ 6 6 01100011-0070790 9 6312 4
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                             
