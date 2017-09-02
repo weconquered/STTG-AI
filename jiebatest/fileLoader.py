@@ -9,6 +9,12 @@ from sentens import *
 from collections import Counter
 import uniout
 
+tag_1 = "/Users/boloomo/Downloads/corpus/1_产品使用说明文档"
+tag_2 = "/Users/boloomo/Downloads/corpus/2_产品制作工艺流程"
+tag_3 = "/Users/boloomo/Downloads/corpus/3_产品原材料需求文档"
+tag_4 = "/Users/boloomo/Downloads/corpus/4_产品外观外形设计文档"
+tag_5 = "/Users/boloomo/Downloads/corpus/5_产品相关专利文档"
+tag_6 = "/Users/boloomo/Downloads/corpus/6_产品工艺设计"
 stop_words = []
 cutlist = "。！？"
 # 加载停用词
@@ -112,14 +118,20 @@ def cutWithWeight(filename):
 def gen_all_words(filePaths, destination_file, clear_stop_word):
     file = open(destination_file, 'w')
     all_words = []
+    count = 0
+    print "共：" + str(len(filePaths)) + " 个文件"
     for filePath in filePaths:
         all_words.extend(cutFile(filePath, clear_stop_word))
+        count+=1
+        print filePath, count
+
     dump(all_words, file)
     file.close()
 
     file = open(destination_file + "_dic", 'w')
     dump(dict(Counter(all_words)), file)
     file.close()
+
 
 def load_all_words(destination_file):
     file = open(destination_file, 'rb')
@@ -136,12 +148,12 @@ def load_all_words(destination_file):
 #
 def step_1():
     gen_all_words(filePaths, "allwords", True);
-    print load_all_words("allwords");
-    print load_all_words("allwords_dic")
+    # print load_all_words("allwords");
+    # print load_all_words("allwords_dic")
 
 
 if __name__ == '__main__':
-    filePathC = "./news"
+    filePathC = tag_1
     filePaths = eachFile(filePathC)
 
     # 加载词典
@@ -149,6 +161,7 @@ if __name__ == '__main__':
     # 加载停用词
 
     loadStopWords()
+    step_1()
     # gen_all_words(filePaths, "allwords", True);
 
     for filePath in filePaths:
