@@ -12,7 +12,7 @@ import math
 from processing import Process as worker
 import uniout
 import sys
-
+# pre_fix = "/home/nimbix/corpus/"
 pre_fix = "/Users/boloomo/Downloads/corpus/"
 tag_1 = pre_fix + "1_产品使用说明文档"
 tag_2 = pre_fix + "2_产品制作工艺流程"
