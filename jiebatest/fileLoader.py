@@ -67,29 +67,59 @@ def cutFileBySentens(filename, clear_stop_word = False):
     # print seg, is_stop_word(seg);
     return result
 
-    # 读取文件内容并打印
-def cutFile(filename, clear_stop_word=False):
-    fopen = open(filename, 'r')  # r 代表read
-    content = ""
-    for eachLine in fopen:
-        # print "读取到得内容如下：", eachLine
-        content += eachLine.replace(" ","")
-    fopen.close()
-    # segList = list(jieba.cut(content))
-    segList = [x.encode('utf-8') for x in list(jieba.cut(content))]
 
-    if clear_stop_word:
-        result = []
-        for seg in segList:
-            if not is_stop_word(seg):
-                result.append(seg)
-        return result
+# 读取文件内容并打印
+def cutFileBySentens2(worker_id, filenames, clear_stop_word=False):
+    # TODO
+    file = open('tmp_filename_'+ str(worker_id), 'w')
+    result = []
 
-    # segList = list(jieba.cut(content))
-    # print filename, ":",' '.join(segList)
-    #for seg in segList:
-        #print seg, is_stop_word(seg);
-    return segList
+    for filename in filenames:
+        try:
+            sentenses = cut_file_sentens(filename)
+        except:
+            continue
+        for sentens in sentenses:
+            result.append((sentens, list(jieba.cut(sentens))))
+    print worker_id, ":", len(result)
+    dump(result, file)
+    file.close()
+
+def cutAllFileBySentens2(tag, filePath):
+    filePaths = eachFile(filePath)
+    worker_size = 5
+    total_len = len(filePaths)
+    sentens_per_worker = math.ceil(total_len / worker_size)
+
+    threads = []
+    # top_x
+    for i in range(0, worker_size):
+        # t = worker(target=gen_all_words_worker,
+        #                      args=(i, filePaths[int(i * sentens_per_worker): int(min((i + 1) * sentens_per_worker, total_len))],clear_stop_word))
+        t = worker(target=cutFileBySentens2,
+                   args=(i, filePaths[int(i * sentens_per_worker): int(min((i + 1) * sentens_per_worker, total_len))]))
+
+        threads.append(t)
+
+    for t in threads:
+        t.setDaemon(True)
+        t.start()
+    for t in threads:
+        t.join()
+    all_words = []
+    # 合并
+    for i in range(0, worker_size):
+        file = open("tmp_filename_" + str(i), 'rb')
+        words = pickle.load(file)
+        all_words.extend(words)
+        file.close()
+        os.remove("tmp_filename_" + str(i))
+
+    print  "总长度", len(all_words)
+    #file = open(tag + "_vec", 'w')
+    #dump(all_words, file)
+    #file.close()
+    return all_words
 
 # 对某字符串分词
 def cut_str(str):
@@ -214,17 +244,23 @@ if __name__ == '__main__':
     # 加载停用词
 
     loadStopWords()
-    step_1("test_", filePaths)
+    # step_1("test_", filePaths)
+
+    # cutAllFileBySentens2("1", tag_1)
+    # cutAllFileBySentens2("2", tag_2)
+    # cutAllFileBySentens2("3", tag_3)
+    cutAllFileBySentens2("4", tag_4)
+    # cutAllFileBySentens2("5", tag_5)
 
     # gen_all_words(filePaths, "allwords", True);
     # print load_all_words("test_allwords_dic")
-    for filePath in filePaths:
+    # for filePath in filePaths:
         #cutFileWithPosseg(filePath)
         #cutFile(filePath)
         # cutWithWeight(filePath)
         # cut_file_sentens(filePath)
         # print  cutFileBySentens(filePath)
-        print "================"
+        # print "================"
 
     # TODO
     # 自动找字典 RUN
