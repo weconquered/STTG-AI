@@ -7,14 +7,17 @@ import pickle
 from pickle import dump
 from sentens import *
 from collections import Counter
+import math
+import threading
 import uniout
 
-tag_1 = "/Users/boloomo/Downloads/corpus/1_产品使用说明文档"
-tag_2 = "/Users/boloomo/Downloads/corpus/2_产品制作工艺流程"
-tag_3 = "/Users/boloomo/Downloads/corpus/3_产品原材料需求文档"
-tag_4 = "/Users/boloomo/Downloads/corpus/4_产品外观外形设计文档"
-tag_5 = "/Users/boloomo/Downloads/corpus/5_产品相关专利文档"
-tag_6 = "/Users/boloomo/Downloads/corpus/6_产品工艺设计"
+pre_fix = "/Users/boloomo/Downloads/corpus/"
+tag_1 = pre_fix + "1_产品使用说明文档"
+tag_2 = pre_fix + "2_产品制作工艺流程"
+tag_3 = pre_fix + "3_产品原材料需求文档"
+tag_4 = pre_fix + "4_产品外观外形设计文档"
+tag_5 = pre_fix + "5_产品相关专利文档"
+tag_6 = pre_fix + "6_产品工艺设计"
 stop_words = []
 cutlist = "。！？"
 # 加载停用词
@@ -115,15 +118,39 @@ def cutWithWeight(filename):
     for seg in segList:
         print seg[0],seg[1], is_stop_word(seg[0])
 
-def gen_all_words(filePaths, destination_file, clear_stop_word):
-    file = open(destination_file, 'w')
-    all_words = []
-    count = 0
-    print "共：" + str(len(filePaths)) + " 个文件"
+all_words = []
+
+def gen_all_words_worker(worker_id, filePaths, clear_stop_word):
+    count_w = 0
+    le = len(filePaths)
     for filePath in filePaths:
         all_words.extend(cutFile(filePath, clear_stop_word))
-        count+=1
-        print filePath, count
+        count_w += 1
+        print worker_id, str(count_w) + "/" + str(le) ,filePath
+
+def gen_all_words(filePaths, destination_file, clear_stop_word):
+    file = open(destination_file, 'w')
+
+    print "共：" + str(len(filePaths)) + " 个文件"
+    worker_size = 5
+    total_len = len(filePaths)
+    sentens_per_worker = math.ceil(total_len / worker_size)
+
+    worker_index = []
+
+    threads = []
+    # top_x
+    for i in range(0, worker_size):
+        worker_index.append((i * sentens_per_worker, min((i + 1) * sentens_per_worker, total_len) - 1))
+        t = threading.Thread(target=gen_all_words_worker,
+                             args=(i, filePaths[int(i * sentens_per_worker): int(min((i + 1) * sentens_per_worker, total_len))],clear_stop_word))
+        threads.append(t)
+
+    for t in threads:
+        t.setDaemon(True)
+        t.start()
+    for t in threads:
+        t.join()
 
     dump(all_words, file)
     file.close()
